@@ -67,15 +67,13 @@ class DB:
         
         
 
-    def insert(self, sender: str, recipient: str, body: str, source: str, flags: list[Flag]) -> None:
+    def insert(self, sender: str, recipient: str, body: str, flags: list[Flag]) -> None:
         if sender is None:
             raise ValueError("Sender can't be None")
         if recipient is None:
             raise ValueError("Recipient can't be None")
         if body is None:
             raise ValueError("Message can't be None")
-        if source is None:
-            raise ValueError("source can't be None")
         if flags is None:
             raise ValueError("warningRanges can't be None")
         
