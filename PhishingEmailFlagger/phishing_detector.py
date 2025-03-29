@@ -52,9 +52,9 @@ def analyze_suspicious(content, content_type):
         model="gemini-2.0-flash",
         contents=f"""Analyze the following {content_type} for phishing indicators.
         - If it is suspicious, respond with "yes".
-        - List any **suspicious phrases** found in the content.
+        - List any suspicious phrases found in the content.
         - If the sender is suspicious, mention why (e.g., fake domains).
-        - If it is **not** phishing, respond with "no".
+        - If it is not phishing, respond with "no".
         Content: {content}"""
         )
         
@@ -114,12 +114,12 @@ def format_suspicious_report(response_text, content_type):
 
     return {"isPhishing": is_phishing, "violations": violations}
 
+# Example Case 
+# sender_email = "john@amazon.com"
+# email_body = "This is an urgent request. Please click here to verify your account."
 
-sender_email = "john@amazon.com"
-email_body = "This is an urgent request. Please click here to verify your account."
+# phishing_report = detect_phishing(sender_email, email_body)
 
-phishing_report = detect_phishing(sender_email, email_body)
-
-print(phishing_report)
+# print(phishing_report)
         
         
