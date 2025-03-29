@@ -1,7 +1,7 @@
 # Imported Packages
 from google import genai
 import re 
-client = genai.Client(api_key="AIzaSyCufR4C6K6BiuTF4ZKS_jjFGvZ_Px90XbQ")
+client = genai.Client(api_key="")
 
 # First write what messages body or subject names would be considered to be suspicious
 # def detect_phishing():
