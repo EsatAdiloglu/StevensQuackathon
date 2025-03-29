@@ -58,7 +58,7 @@ def analyze_suspicious(content, content_type):
         Content: {content}"""
         )
         
-        print(f"Raw Gemini Response for {content_type}:\n", response.text)
+        # print(f"Raw Gemini Response for {content_type}:\n", response.text)
         
         result = format_suspicious_report(response.text, content_type)
         
