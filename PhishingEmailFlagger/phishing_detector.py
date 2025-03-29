@@ -1,6 +1,7 @@
 # Imported Packages
 from google import genai
-import re 
+import re
+import smtplib
 client = genai.Client(api_key="")
 
 # First write what messages body or subject names would be considered to be suspicious
@@ -60,7 +61,7 @@ def analyze_suspicious(content, content_type):
         
         # print(f"Raw Gemini Response for {content_type}:\n", response.text)
         
-        result = format_suspicious_report(response.text, content_type)
+        result = format_suspicious_report(response.text, content_type, content)
         
         return result
 
@@ -82,7 +83,29 @@ def analyze_suspicious(content, content_type):
             
 #         return {"isPhishing": is_phishing, "violations": violations}
 
-def format_suspicious_report(response_text, content_type):
+def report_phising_email(email_body):
+     # Reporting the phising email to the right service to get their attention
+    From = "reportingphisingemails@gmail.com"
+    to = ["reportphishing@apwg.org"]
+    subject = "Reporting Phising Email Address and Message"
+    message = email_body
+
+    message = f"""\
+            From: {From}
+            To: {",".join(to)}
+            Subject: {subject}
+            
+            {message}
+            """
+    
+    server = smtplib.SMTP("smtp.gmail.com", 587)
+    server.starttls()
+    server.login(From, "pass")
+
+    server.sendmail(From, to, message)
+    server.quit()
+
+def format_suspicious_report(response_text, content_type, content):
     is_phishing = False
     violations = []
 
@@ -90,7 +113,7 @@ def format_suspicious_report(response_text, content_type):
     
     if "yes" in response_text:
         is_phishing = True
-
+        report_phising_email(content)
         phrase_pattern = r"'([^']+)'"
         phrases_found = re.findall(phrase_pattern, response_text)
 
