@@ -1,7 +1,18 @@
 # Imported Packages
 from google import genai
 import re 
-client = genai.Client(api_key="")
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
+
+api_key = os.getenv("GEMINI_API")
+
+client = None
+if api_key:
+    client = genai.configure(api_key=api_key)
+else:
+    raise ValueError("Gemini API key is missing")
 
 # First write what messages body or subject names would be considered to be suspicious
 # def detect_phishing():
