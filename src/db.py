@@ -53,13 +53,18 @@ class DB:
             flags
         )
     
-    def select(self, id: int=None, sender: str=None) -> Record:
+    def select(self, id: int=None, sender: str=None) -> list[Record]:
         cursor = self.cursor
         self._conn.row_factory = Factories._raw_record_factory
         if(id):
-            return self._pairFlags(cursor.fetchone())
+            return [self._pairFlags(cursor.fetchone(f"SELECT * FROM {REPORT_TABLE_NAME} WHERE id=?", (id,)))]
         if(sender):
-            return self._pairFlags(cursor.fetchone())
+            return [self._pairFlags(cursor.fetchone(f"SELECT * FROM {REPORT_TABLE_NAME} WHERE sender=?", (sender,)))]
+        
+        res: list[_RawRecord] = cursor.fetchall(f"SELECT * FROM {REPORT_TABLE_NAME}")
+        reports = [ self._pairFlags(r) for r in res ]
+        return reports
+        
         
 
     def insert(self, sender: str, recipient: str, body: str, source: str, flags: list[Flag]) -> None:
