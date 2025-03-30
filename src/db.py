@@ -1,8 +1,9 @@
 import sqlite3
+import os
 from src.db_types import _RawRecord, Record, Flag
 
-#DB_NAME = "phisingReport.db"
-DB_NAME = ":memory:"
+DB_NAME = "data/phisingReport.db"
+#DB_NAME = ":memory:"
 REPORT_TABLE_NAME = "reports"
 FLAG_TABLE_NAME = "flags"
 
@@ -17,8 +18,12 @@ class DB:
     cursor: sqlite3.Cursor
     
     def __init__(self):
+        db_exists = os.path.isfile(DB_NAME)
         self._conn = sqlite3.connect(DB_NAME)
         self.cursor = self._conn.cursor()
+
+        if(not db_exists):
+            self.createTable()
 
     def createTable(self):
         self.cursor.execute(f'''
@@ -79,18 +84,18 @@ class DB:
         
         
         try:
-            self.cursor.execute('''
-                INSERT INTO reports (recipient, sender, message)
-                VALUES (?,?,?,?)
+            self.cursor.execute(f'''
+                INSERT INTO {REPORT_TABLE_NAME} (recipient, sender, body)
+                VALUES (?,?,?)
             ''', (recipient, sender, body))
             
             report_id: int = self.cursor.lastrowid
             
             entries = [(report_id, source, from_idx, to_idx, reason) for _, _, source, from_idx, to_idx, reason in flags]
             
-            self.cursor.executemany('''
-                INSERT INTO warningLevels (report_id, source, from_idx, to_idx, reason)
-                VALUES 
+            self.cursor.executemany(f'''
+                INSERT INTO {FLAG_TABLE_NAME} (report_id, source, from_idx, to_idx, reason)
+                VALUES (?,?,?,?,?)
             ''', entries)
             
             self._conn.commit()
