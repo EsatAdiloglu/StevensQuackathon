@@ -111,11 +111,6 @@ def format_suspicious_report(response_text, content_type, content):
         report_phising_email(content)
         phrase_pattern = r'\*+\s*"([^"]+)"'
 
-<<<<<<< HEAD
-        phrase_pattern = r'\*+\s*"([^"]+)"'
-
-=======
->>>>>>> dev
         phrases_found = re.findall(phrase_pattern, response_text)
 
         for phrase in phrases_found:
