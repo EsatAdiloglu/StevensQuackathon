@@ -13,6 +13,9 @@ if api_key:
     client = genai.Client(api_key=api_key)
 else:
     raise ValueError("Gemini API key is missing")
+import re
+import smtplib
+client = genai.Client(api_key=api_key)
 
 # First write what messages body or subject names would be considered to be suspicious
 # def detect_phishing():
@@ -71,29 +74,33 @@ def analyze_suspicious(content, content_type):
         
         print(f"Raw Gemini Response for {content_type}:\n", response.text)
         
-        result = format_suspicious_report(response.text, content_type)
+        result = format_suspicious_report(response.text, content_type, content)
         
         return result
 
-# def format_suspicious_report(reponse_text, content_type):
-#         is_phishing = False
-#         violations = []
-        
-#         if "yes" in reponse_text:
-#             is_phishing = True
-        
-        
-#         elif "no" in reponse_text:
-#             is_phishing = False 
-        
+def report_phising_email(email_body):
+     # Reporting the phising email to the right service to get their attention
+    From = "reportingphisingemails@gmail.com"
+    to = ["reportphishing@apwg.org"]
+    subject = "Reporting Phising Email Address and Message"
+    message = email_body
 
-#         # case for no violations found or an empty violation
-#         if not violations:
-#             violations = []
+    message = f"""\
+            From: {From}
+            To: {",".join(to)}
+            Subject: {subject}
             
-#         return {"isPhishing": is_phishing, "violations": violations}
+            {message}
+            """
+    
+    server = smtplib.SMTP("smtp.gmail.com", 587)
+    server.starttls()
+    server.login(From, "qbtu awne oaqj zfhl")
 
-def format_suspicious_report(response_text, content_type):
+    server.sendmail(From, to, message)
+    server.quit()
+
+def format_suspicious_report(response_text, content_type, content):
     is_phishing = False
     violations = []
 
@@ -101,15 +108,20 @@ def format_suspicious_report(response_text, content_type):
     
     if "yes" in response_text:
         is_phishing = True
-
+        report_phising_email(content)
         phrase_pattern = r'\*+\s*"([^"]+)"'
 
+<<<<<<< HEAD
+        phrase_pattern = r'\*+\s*"([^"]+)"'
+
+=======
+>>>>>>> dev
         phrases_found = re.findall(phrase_pattern, response_text)
 
         for phrase in phrases_found:
             violations.append({
                 "reason": f"Suspicious phrase: '{phrase}'",
-                "section": content_type.capitalize()
+                "section": phrase
             })
 
         domain_pattern = r"[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}"
@@ -118,7 +130,7 @@ def format_suspicious_report(response_text, content_type):
         for domain in domains_found:
             violations.append({
                 "reason": f"Suspicious email domain: {domain}",
-                "section": content_type.capitalize()
+                "section": domain
             })
 
     elif "no" in response_text:
