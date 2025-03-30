@@ -50,7 +50,7 @@ class DB:
     def _pairFlags(self, report: _RawRecord) -> Record:
         cursor = self.cursor
         self._conn.row_factory = Factories._flag_factory
-        flags: list[Flag] = cursor.fetchall(f"SELECT * FROM {FLAG_TABLE_NAME} WHERE report_id=?", (report.id,))
+        flags: list[Flag] = cursor.execute(f"SELECT * FROM {FLAG_TABLE_NAME} WHERE report_id=?", (report[0],))
         
         self._conn.row_factory = None
         return Record(
@@ -62,11 +62,15 @@ class DB:
         cursor = self.cursor
         self._conn.row_factory = Factories._raw_record_factory
         if(id):
-            return [self._pairFlags(cursor.fetchone(f"SELECT * FROM {REPORT_TABLE_NAME} WHERE id=?", (id,)))]
+            cursor.execute(f"SELECT * FROM {REPORT_TABLE_NAME} WHERE id=?", (id,))
+            return [self._pairFlags(cursor.fetchone())]
         if(sender):
-            return [self._pairFlags(cursor.fetchone(f"SELECT * FROM {REPORT_TABLE_NAME} WHERE sender=?", (sender,)))]
+            cursor.execute(f"SELECT * FROM {REPORT_TABLE_NAME} WHERE sender=?", (sender,))
+            return [self._pairFlags(cursor.fetchone())]
         
-        res: list[_RawRecord] = cursor.fetchall(f"SELECT * FROM {REPORT_TABLE_NAME}")
+        cursor.execute(f"SELECT * FROM {REPORT_TABLE_NAME}")
+        res: list[_RawRecord] = cursor.fetchall()
+        print(res)
         reports = [ self._pairFlags(r) for r in res ]
         return reports
         

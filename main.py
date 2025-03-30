@@ -1,4 +1,5 @@
 import typer
+from typing_extensions import Annotated
 import re
 from src.phishing_detector import detect_phishing
 from src.db import DB
@@ -37,7 +38,7 @@ def check(sender: str, recipient: str, body: str):
     return res
 
 @app.command()
-def list_report(sender: str | None):
+def list(sender: str | None = None):
     if(sender):
         return db.select(sender=sender)
     return db.select()
