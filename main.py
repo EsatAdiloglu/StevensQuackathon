@@ -1,8 +1,8 @@
 import typer
 import re
-from phishing_detector import detect_phishing
-from db import DB
-from db_types import Flag
+from src.phishing_detector import detect_phishing
+from src.db import DB
+from src.db_types import Flag
 
 app = typer.Typer()
 db = DB()
@@ -33,6 +33,7 @@ def check(sender: str, recipient: str, body: str):
                 flags.append(Flag(None, None, "body", fr, to, reason))
 
         db.insert(sender,recipient,body,flags)
+    print(res)
     return res
 
 @app.command()

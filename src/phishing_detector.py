@@ -10,7 +10,7 @@ api_key = os.getenv("GEMINI_API")
 
 client = None
 if api_key:
-    client = genai.configure(api_key=api_key)
+    client = genai.Client(api_key=api_key)
 else:
     raise ValueError("Gemini API key is missing")
 

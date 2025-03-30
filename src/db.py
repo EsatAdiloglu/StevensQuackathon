@@ -1,5 +1,5 @@
 import sqlite3
-from db_types import _RawRecord, Record, Flag
+from src.db_types import _RawRecord, Record, Flag
 
 #DB_NAME = "phisingReport.db"
 DB_NAME = ":memory:"
