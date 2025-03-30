@@ -69,7 +69,7 @@ def analyze_suspicious(content, content_type):
         Content: {content}"""
         )
         
-        # print(f"Raw Gemini Response for {content_type}:\n", response.text)
+        print(f"Raw Gemini Response for {content_type}:\n", response.text)
         
         result = format_suspicious_report(response.text, content_type)
         
@@ -102,7 +102,8 @@ def format_suspicious_report(response_text, content_type):
     if "yes" in response_text:
         is_phishing = True
 
-        phrase_pattern = r"'([^']+)'"
+        phrase_pattern = r'\*+\s*"([^"]+)"'
+
         phrases_found = re.findall(phrase_pattern, response_text)
 
         for phrase in phrases_found:
