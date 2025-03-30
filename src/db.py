@@ -1,5 +1,5 @@
 import sqlite3
-from db_types import _RawRecord, Record, Flag
+from src.db_types import _RawRecord, Record, Flag
 
 #DB_NAME = "phisingReport.db"
 DB_NAME = ":memory:"
@@ -53,24 +53,27 @@ class DB:
             flags
         )
     
-    def select(self, id: int=None, sender: str=None) -> Record:
+    def select(self, id: int=None, sender: str=None) -> list[Record]:
         cursor = self.cursor
         self._conn.row_factory = Factories._raw_record_factory
         if(id):
-            return self._pairFlags(cursor.fetchone())
+            return [self._pairFlags(cursor.fetchone(f"SELECT * FROM {REPORT_TABLE_NAME} WHERE id=?", (id,)))]
         if(sender):
-            return self._pairFlags(cursor.fetchone())
+            return [self._pairFlags(cursor.fetchone(f"SELECT * FROM {REPORT_TABLE_NAME} WHERE sender=?", (sender,)))]
+        
+        res: list[_RawRecord] = cursor.fetchall(f"SELECT * FROM {REPORT_TABLE_NAME}")
+        reports = [ self._pairFlags(r) for r in res ]
+        return reports
+        
         
 
-    def insert(self, sender: str, recipient: str, body: str, source: str, flags: list[Flag]) -> None:
+    def insert(self, sender: str, recipient: str, body: str, flags: list[Flag]) -> None:
         if sender is None:
             raise ValueError("Sender can't be None")
         if recipient is None:
             raise ValueError("Recipient can't be None")
         if body is None:
             raise ValueError("Message can't be None")
-        if source is None:
-            raise ValueError("source can't be None")
         if flags is None:
             raise ValueError("warningRanges can't be None")
         
